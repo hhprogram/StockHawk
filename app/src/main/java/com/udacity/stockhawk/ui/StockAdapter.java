@@ -20,6 +20,8 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+//for recyclerView.Adapter classes. The adapter type is the class name of the adapter class and then
+//the type of viewHolder. The viewHolder is declared below in the Override constructor methods
 class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
 
     private final Context context;
@@ -61,6 +63,9 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
         return new StockViewHolder(item);
     }
 
+//    when the adapter moves to POSITION, it calls this method with the holder associated
+//    with the view it must show. Below the method just populates the HOLDER with the necessary
+//    stock info (price) and the change in price depending on the shared preferences
     @Override
     public void onBindViewHolder(StockViewHolder holder, int position) {
 
@@ -107,6 +112,7 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
         void onClick(String symbol);
     }
 
+//    the viewHolder class that is tied to this adapter
     class StockViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         @BindView(R.id.symbol)

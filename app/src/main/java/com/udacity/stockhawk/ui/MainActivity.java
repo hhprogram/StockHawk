@@ -112,6 +112,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
+    /**
+     * Creates a new AddStockDialog instance which is a Dialog Fragment. Look up the show() methods
+     * for DialogFragment in Android to see why it is like that
+     * @param view - unused parameter in this case, but we need it to follow the structure of a
+     *             method that is tied to the XML of a layout hosted by this activity. See
+     *             ACTIVITY_MAIN.XML -> the floating action button and see the onClick tag
+     *             will call a function called button. This method needs to be implmented in the
+     *             activity that is hosting the layout and be public, return void, have 1 view
+     *             parameter
+     */
     public void button(@SuppressWarnings("UnusedParameters") View view) {
         new AddStockDialog().show(getFragmentManager(), "StockDialogFragment");
     }
@@ -157,6 +167,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
 
+    /**
+     * Helper method that changes what the menu item ITEM's icon is depending on the current
+     * shared preferences value obtained by the PrefUtils. getDisplayMode() method
+     * @param item - the specific item in the Menu that we want to change the display mode of
+     */
     private void setDisplayModeMenuItemIcon(MenuItem item) {
         if (PrefUtils.getDisplayMode(this)
                 .equals(getString(R.string.pref_display_mode_absolute_key))) {
@@ -166,6 +181,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
     }
 
+//    create a options menu - where the item isn't a drop down of all possible options but is
+//    just an action that changes the green and red sections to show either absolute dollars or %
+//    change. The ACTION_CHANGE_UNITS id can be found under res/menu/main_activity_settings
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_activity_settings, menu);
@@ -174,6 +192,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return true;
     }
 
+    /**
+     * Method for when the menu item is clicked, toggles the display mode in the sharedPref if
+     * the menu item is the ACTION_CHANGE_UNITS item
+     * @param item - the menu item that was selcted
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();

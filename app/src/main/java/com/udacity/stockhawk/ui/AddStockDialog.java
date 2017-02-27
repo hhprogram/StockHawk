@@ -23,6 +23,10 @@ import butterknife.ButterKnife;
 
 public class AddStockDialog extends DialogFragment {
 
+//    note: the @BindView notation is a ButterKnife paradigm. Just a more concise way of doing:
+//    EditText stock = (EditText) getActivity().findViewById(R.id.dialog_stock)...
+//    ie this assigns stock to the edittext view that will be shown (and later inflated below)
+//    in our ADD_STOCK_DIALOG layout
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.dialog_stock)
     EditText stock;
@@ -30,6 +34,9 @@ public class AddStockDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
+//        Building object allows you to set the buttons, message and the 'content' area of the
+//        dialogFragment. We use AlertDialog as it allows for many dialog designs. Not necessarliy
+//        tied to actually alerting the use to anything
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         LayoutInflater inflater = LayoutInflater.from(getActivity());
@@ -37,6 +44,8 @@ public class AddStockDialog extends DialogFragment {
 
         ButterKnife.bind(this, custom);
 
+//      sets a listener if user takes an action while in the editText. For example, with this
+//        implemented if you just press "enter" it will trigger this listerner and call addStock
         stock.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -46,6 +55,9 @@ public class AddStockDialog extends DialogFragment {
         });
         builder.setView(custom);
 
+//        note: if you comment these out then they won't appear the the dialogFragment that pops
+//        up when hitting the floating button. ex. comment out the setNegativeButton then there will
+//        be no option to 'cancel' the input
         builder.setMessage(getString(R.string.dialog_title));
         builder.setPositiveButton(getString(R.string.dialog_add),
                 new DialogInterface.OnClickListener() {
