@@ -1,6 +1,7 @@
 package com.udacity.stockhawk.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -28,6 +29,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
+//note that this implements the StockAdapter.SocktAdapter onClickHandler interface - therefore,
+//when we initiate a stock adapter instance object we feed it this as the onClickHandler (see
+//constructor in StockAdapter) therefore when in StockAdapter we call onClick on the specific
+//StockAdapterOnClickHandler given it calls this class' onClick method defined below (ie they have
+//the onclick handling / listening mostly set up, now need it to take me to another activity)
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>,
         SwipeRefreshLayout.OnRefreshListener,
         StockAdapter.StockAdapterOnClickHandler {
@@ -47,6 +53,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onClick(String symbol) {
         Timber.d("Symbol clicked: %s", symbol);
+        Intent intent = new Intent(this, DetailActivity.class);
+        Bundle bundle = new Bundle();
+        bundle.putString(Contract.Quote.COLUMN_SYMBOL, symbol);
+        intent.putExtras(bundle);
+        startActivity(intent);
     }
 
     @Override

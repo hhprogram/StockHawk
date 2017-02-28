@@ -4,9 +4,16 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
 import com.udacity.stockhawk.R;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -114,6 +121,61 @@ public final class PrefUtils {
         }
 
         editor.apply();
+    }
+
+    /**
+     * converts string to LINEDATA (object used in MPANDROIDCHART library - which is what we're
+     * using to graph historical data
+     * @param context - the CONTEXT that is calling this so we can use XML resources etc..
+     * @param data - the data points to be transformed into a DATASET. this is just the String
+     *             that is stored in the DB table (ie has date in milliseconds and the associated
+     *             closing price)
+     * @return a hashmap with 2 values (1) LINEDATA object, which is an object in the MPandroidChart
+     *          library which holds data found in DATA (2) an array of labels associated with DATA
+     *          to be used for x axis labels
+     */
+    public static HashMap<String, Object> str_to_line_data(Context context, String data) {
+//        holds the data points to be graphed
+        ArrayList<Entry> entries = new ArrayList<>();
+//        holds the labels that the ENTRIES correspond to
+        ArrayList<String> labels = new ArrayList<>();
+        HashMap<String, Object> chart_data = new HashMap<>();
+        int position = 0;
+        int comma = 0;
+        int new_line = 0;
+        Long time;
+        Date date;
+        String str_date, price;
+        SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.date_format));
+        while (position < data.length() - 1) {
+            comma = data.indexOf(context.getString(R.string.comma), position);
+            time = Long.parseLong(data.substring(position, comma));
+            date = new Date(time);
+            str_date = sdf.format(date);
+            labels.add(str_date);
+            new_line = data.indexOf(context.getString(R.string.new_line), position);
+            price = data.substring(comma+1, new_line);
+            entries.add(new Entry(time.floatValue(), Float.parseFloat(price)));
+            //move my starting point POSITION by the difference between the newLine and the old
+            //POSITION (which gets me to the newline char and then add 1 to get to the first letter)
+            position = position + (new_line-position) + 1;
+        }
+        LineDataSet lineDataSet = new LineDataSet(entries, context.getString(R.string.hist_prices));
+        LineData lineData = new LineData(lineDataSet);
+        chart_data.put(context.getString(R.string.line_data), lineData);
+        chart_data.put(context.getString(R.string.line_labels), labels.toArray());
+        return chart_data;
+    }
+
+    public static String[] convert_array(Object[] arr) {
+        String[] str_arr = new String[arr.length];
+        int count = 0;
+        for (Object i : arr) {
+            String str = (String) i;
+            str_arr[count] = str;
+            count++;
+        }
+        return str_arr;
     }
 
 }

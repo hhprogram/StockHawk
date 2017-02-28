@@ -81,6 +81,10 @@ public final class QuoteSyncJob {
 
                 // WARNING! Don't request historical data for a stock that doesn't exist!
                 // The request will hang forever X_x
+                //each element in this list is a HISTORICAL QUOTE object which has an attribute
+                //called DATE (which is retrieved below by GETDATE(), and a close price attribute
+                //which is retrieved via getClose() method
+                // see the commented out Timber code in the StockAdapter's onBindViewHolder method
                 List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
 
                 StringBuilder historyBuilder = new StringBuilder();

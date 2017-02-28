@@ -71,6 +71,9 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
 
         cursor.moveToPosition(position);
 
+//        Timber.d("history for %s : %s", cursor.getString(Contract.Quote.POSITION_SYMBOL),
+//                cursor.getString(Contract.Quote.POSITION_HISTORY));
+
 
         holder.symbol.setText(cursor.getString(Contract.Quote.POSITION_SYMBOL));
         holder.price.setText(dollarFormat.format(cursor.getFloat(Contract.Quote.POSITION_PRICE)));
