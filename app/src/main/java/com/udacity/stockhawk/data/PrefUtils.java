@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import timber.log.Timber;
+
 public final class PrefUtils {
 
     private PrefUtils() {
@@ -156,11 +158,15 @@ public final class PrefUtils {
             new_line = data.indexOf(context.getString(R.string.new_line), position);
             price = data.substring(comma+1, new_line);
             entries.add(new Entry(time.floatValue(), Float.parseFloat(price)));
+            Timber.d("Time: %f \n Price: %f", time.floatValue(), Float.parseFloat(price));
             //move my starting point POSITION by the difference between the newLine and the old
             //POSITION (which gets me to the newline char and then add 1 to get to the first letter)
             position = position + (new_line-position) + 1;
         }
+        Timber.d(entries.get(0).toString());
         LineDataSet lineDataSet = new LineDataSet(entries, context.getString(R.string.hist_prices));
+//        lineDataSet.setColor(R.color.colorPrimary);
+        lineDataSet.setColors(new int[] {R.color.material_blue_500}, context);
         LineData lineData = new LineData(lineDataSet);
         chart_data.put(context.getString(R.string.line_data), lineData);
         chart_data.put(context.getString(R.string.line_labels), labels.toArray());

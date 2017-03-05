@@ -17,6 +17,7 @@ import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
 
+import java.util.Date;
 import java.util.HashMap;
 
 import timber.log.Timber;
@@ -41,6 +42,7 @@ public class DetailActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_detail);
         detailBundle = intent.getExtras();
         stockSymbol = detailBundle.getString(Contract.Quote.COLUMN_SYMBOL);
+        getSupportActionBar().setTitle(stockSymbol);
         getSupportLoaderManager().initLoader(STOCK_LOADER, null, this);
     }
 
@@ -64,6 +66,7 @@ public class DetailActivity extends AppCompatActivity implements
         //instantiated
         Object[] obj_arr = (Object[]) chart_data.get(getString(R.string.line_labels));
         final String[] labels = PrefUtils.convert_array(obj_arr);
+        Timber.d(labels[0]);
         LineChart chart = (LineChart) findViewById(R.id.chart);
         chart.setData(lineData);
         //axis formatter that refers to the LABELS array to put down nice x axis labels
@@ -71,18 +74,15 @@ public class DetailActivity extends AppCompatActivity implements
             //trying to put in logic to only put labels in certain intervals
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                int index = (int) value;
-                if (index % 4 == 0) {
-                    return labels[index];
-                }
-                else {
-                    return "";
-                }
+                long date_num = (long) value;
+                Date date = new Date(date_num);
+                return date.toString();
             }
         };
         XAxis xaxis = chart.getXAxis();
         xaxis.setValueFormatter(axisValueFormatter);
         chart.invalidate();
+
 
     }
 
