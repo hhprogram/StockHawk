@@ -17,7 +17,6 @@ import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
 
-import java.util.Date;
 import java.util.HashMap;
 
 import timber.log.Timber;
@@ -64,24 +63,25 @@ public class DetailActivity extends AppCompatActivity implements
         //actually makes a copy of this variable vs. actually acessing therefore, need to declare
         //final such that you don't change value of variable after an inner class variable has been
         //instantiated
-        Object[] obj_arr = (Object[]) chart_data.get(getString(R.string.line_labels));
-        final String[] labels = PrefUtils.convert_array(obj_arr);
-        Timber.d(labels[0]);
-        LineChart chart = (LineChart) findViewById(R.id.chart);
-        chart.setData(lineData);
+        HashMap<Integer, String> labels = (HashMap<Integer, String>) chart_data
+                .get(getString(R.string.line_labels));
+        LineChart finalchart = (LineChart) findViewById(R.id.chart);
+        finalchart.setData(lineData);
+
         //axis formatter that refers to the LABELS array to put down nice x axis labels
         IAxisValueFormatter axisValueFormatter = new IAxisValueFormatter() {
             //trying to put in logic to only put labels in certain intervals
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-                long date_num = (long) value;
-                Date date = new Date(date_num);
-                return date.toString();
+//                long date_num = (long) value;
+//                Date date = new Date(date_num);
+//                return date.toString();
+                return "1";
             }
         };
-        XAxis xaxis = chart.getXAxis();
+        XAxis xaxis = finalchart.getXAxis();
         xaxis.setValueFormatter(axisValueFormatter);
-        chart.invalidate();
+        finalchart.invalidate();
 
 
     }

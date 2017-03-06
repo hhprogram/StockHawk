@@ -12,6 +12,7 @@ import com.udacity.stockhawk.R;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -139,9 +140,11 @@ public final class PrefUtils {
     public static HashMap<String, Object> str_to_line_data(Context context, String data) {
 //        holds the data points to be graphed
         ArrayList<Entry> entries = new ArrayList<>();
-//        holds the labels that the ENTRIES correspond to
-        ArrayList<String> labels = new ArrayList<>();
         HashMap<String, Object> chart_data = new HashMap<>();
+        //for now have a hashmap that just holds as keys the position within the substring of the
+        //beginning of the date Long value, and its value as the String date representation of the
+        //Long value
+        HashMap<Integer, String> labels = new HashMap<>();
         int position = 0;
         int comma = 0;
         int new_line = 0;
@@ -149,27 +152,35 @@ public final class PrefUtils {
         Date date;
         String str_date, price;
         SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.date_format));
+        //loops through whole string (which holds historical data). Parses and gets the date and
+        //corresponding price and makes entries and puts them into an ArrayList. Also, converts
+        //the Long value (which is what the date is stored as) into its string representation and
+        //puts it in LABELS to be used later when labeling the x axis
         while (position < data.length() - 1) {
             comma = data.indexOf(context.getString(R.string.comma), position);
             time = Long.parseLong(data.substring(position, comma));
             date = new Date(time);
             str_date = sdf.format(date);
-            labels.add(str_date);
+            labels.put(position, str_date);
             new_line = data.indexOf(context.getString(R.string.new_line), position);
             price = data.substring(comma+1, new_line);
-            entries.add(new Entry(time.floatValue(), Float.parseFloat(price)));
-            Timber.d("Time: %f \n Price: %f", time.floatValue(), Float.parseFloat(price));
+            entries.add(new Entry(position, Float.parseFloat(price)));
+            Timber.d("Time: %s (position: %d)\n Price: %f", str_date, position
+                    , Float.parseFloat(price));
             //move my starting point POSITION by the difference between the newLine and the old
             //POSITION (which gets me to the newline char and then add 1 to get to the first letter)
             position = position + (new_line-position) + 1;
         }
-        Timber.d(entries.get(0).toString());
+        //the data is most recent is at the front of string so need to reverse entries list
+        Collections.reverse(entries);
+        Timber.d(entries.getClass().toString());
+        Timber.d(entries.get(0).toString() + labels.get(2633));
         LineDataSet lineDataSet = new LineDataSet(entries, context.getString(R.string.hist_prices));
 //        lineDataSet.setColor(R.color.colorPrimary);
         lineDataSet.setColors(new int[] {R.color.material_blue_500}, context);
         LineData lineData = new LineData(lineDataSet);
         chart_data.put(context.getString(R.string.line_data), lineData);
-        chart_data.put(context.getString(R.string.line_labels), labels.toArray());
+        chart_data.put(context.getString(R.string.hist_prices), entries);
         return chart_data;
     }
 
