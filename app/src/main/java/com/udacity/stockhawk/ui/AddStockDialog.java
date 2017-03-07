@@ -79,6 +79,8 @@ public class AddStockDialog extends DialogFragment {
 
     private void addStock() {
         Activity parent = getActivity();
+        //checking if the parent of this activity is the MainActivity then we call the MainActivity
+        //addStock method
         if (parent instanceof MainActivity) {
             ((MainActivity) parent).addStock(stock.getText().toString());
         }

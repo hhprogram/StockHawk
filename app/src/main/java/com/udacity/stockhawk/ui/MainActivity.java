@@ -148,6 +148,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
 
             PrefUtils.addStock(this, symbol);
+            //this calls the intent service to kick off the process of updating the main screen with
+            //the latest stock symbols in the sharedPref and the latest data from online
             QuoteSyncJob.syncImmediately(this);
         }
     }
@@ -181,15 +183,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     /**
      * Helper method that changes what the menu item ITEM's icon is depending on the current
      * shared preferences value obtained by the PrefUtils. getDisplayMode() method
+     * Trying to dynamically set the title of the menu item (which also sets the contentDescription
+     * to the title as well) depending on the current setting
      * @param item - the specific item in the Menu that we want to change the display mode of
      */
     private void setDisplayModeMenuItemIcon(MenuItem item) {
         if (PrefUtils.getDisplayMode(this)
                 .equals(getString(R.string.pref_display_mode_absolute_key))) {
             item.setIcon(R.drawable.ic_percentage);
+            item.setTitle(R.string.menu_title_dollar);
         } else {
             item.setIcon(R.drawable.ic_dollar);
+            item.setTitle(R.string.menu_title_percent);
         }
+
     }
 
 //    create a options menu - where the item isn't a drop down of all possible options but is

@@ -141,16 +141,28 @@ public final class PrefUtils {
 //        holds the data points to be graphed
         ArrayList<Entry> entries = new ArrayList<>();
         HashMap<String, Object> chart_data = new HashMap<>();
+        //array that holds the COUNT for the first date in this historical period and then most
+        //current date in this historical period
         //for now have a hashmap that just holds as keys the position within the substring of the
         //beginning of the date Long value, and its value as the String date representation of the
         //Long value
-        HashMap<Integer, String> labels = new HashMap<>();
+        HashMap<Integer, Date> labels = new HashMap<>();
         int position = 0;
         int comma = 0;
         int new_line = 0;
+        //store the min and max over this historical period so I can easily present it in the detail
+        //view
+        float min = 1000000;
+        float max = 0;
+        float price_float;
+        Integer count = data.length();
+        //x axis value that corresponds to the most current date
+        int end_value = count;
+        int min_time = 0;
+        int max_time = 0;
         Long time;
         Date date;
-        String str_date, price;
+        String str_date, price_str;
         SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.date_format));
         //loops through whole string (which holds historical data). Parses and gets the date and
         //corresponding price and makes entries and puts them into an ArrayList. Also, converts
@@ -160,27 +172,48 @@ public final class PrefUtils {
             comma = data.indexOf(context.getString(R.string.comma), position);
             time = Long.parseLong(data.substring(position, comma));
             date = new Date(time);
-            str_date = sdf.format(date);
-            labels.put(position, str_date);
+            labels.put(count, date);
             new_line = data.indexOf(context.getString(R.string.new_line), position);
-            price = data.substring(comma+1, new_line);
-            entries.add(new Entry(position, Float.parseFloat(price)));
-            Timber.d("Time: %s (position: %d)\n Price: %f", str_date, position
-                    , Float.parseFloat(price));
+            price_str = data.substring(comma+1, new_line);
+            price_float = Float.parseFloat(price_str);
+            entries.add(new Entry(count, price_float));
+            Timber.d("Time: %s (position: %d)\n Price: %f", date.toString(), position
+                    , price_float);
             //move my starting point POSITION by the difference between the newLine and the old
             //POSITION (which gets me to the newline char and then add 1 to get to the first letter)
             position = position + (new_line-position) + 1;
+            Timber.d(count.toString());
+            if (price_float < min) {
+                min = price_float;
+                min_time = count;
+            }
+            if (price_float > max) {
+                max = price_float;
+                max_time = count;
+            }
+            count -= 1;
+
         }
+        //x axis value that will correspond to the least current date in this historical period
+        //need to add one back as at end of while loop count is one less than the actual last
+        //entry
+        int beg_value = count+1;
         //the data is most recent is at the front of string so need to reverse entries list
         Collections.reverse(entries);
         Timber.d(entries.getClass().toString());
         Timber.d(entries.get(0).toString() + labels.get(2633));
         LineDataSet lineDataSet = new LineDataSet(entries, context.getString(R.string.hist_prices));
-//        lineDataSet.setColor(R.color.colorPrimary);
-        lineDataSet.setColors(new int[] {R.color.material_blue_500}, context);
+        lineDataSet.setColors(new int[] {R.color.colorPrimaryDark}, context);
         LineData lineData = new LineData(lineDataSet);
         chart_data.put(context.getString(R.string.line_data), lineData);
         chart_data.put(context.getString(R.string.hist_prices), entries);
+        chart_data.put(context.getString(R.string.line_labels), labels);
+        chart_data.put(context.getString(R.string.start_date), beg_value);
+        chart_data.put(context.getString(R.string.end_date), end_value);
+        chart_data.put(context.getString(R.string.min_price), min);
+        chart_data.put(context.getString(R.string.max_price), max);
+        chart_data.put(context.getString(R.string.min_date), min_time);
+        chart_data.put(context.getString(R.string.max_date), max_time);
         return chart_data;
     }
 

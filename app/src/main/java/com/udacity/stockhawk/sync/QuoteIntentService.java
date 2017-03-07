@@ -12,6 +12,8 @@ public class QuoteIntentService extends IntentService {
         super(QuoteIntentService.class.getSimpleName());
     }
 
+    //when this class receives an intent and it is handle - then it calls the getQuotes method
+    //in QuoteSyncJob
     @Override
     protected void onHandleIntent(Intent intent) {
         Timber.d("Intent handled");

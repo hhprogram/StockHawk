@@ -7,9 +7,11 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
@@ -17,6 +19,8 @@ import com.udacity.stockhawk.R;
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 import timber.log.Timber;
@@ -42,6 +46,7 @@ public class DetailActivity extends AppCompatActivity implements
         detailBundle = intent.getExtras();
         stockSymbol = detailBundle.getString(Contract.Quote.COLUMN_SYMBOL);
         getSupportActionBar().setTitle(stockSymbol);
+
         getSupportLoaderManager().initLoader(STOCK_LOADER, null, this);
     }
 
@@ -63,8 +68,9 @@ public class DetailActivity extends AppCompatActivity implements
         //actually makes a copy of this variable vs. actually acessing therefore, need to declare
         //final such that you don't change value of variable after an inner class variable has been
         //instantiated
-        HashMap<Integer, String> labels = (HashMap<Integer, String>) chart_data
+        final HashMap<Integer, Date> labels = (HashMap<Integer, Date>) chart_data
                 .get(getString(R.string.line_labels));
+        final SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/YY");
         LineChart finalchart = (LineChart) findViewById(R.id.chart);
         finalchart.setData(lineData);
 
@@ -73,14 +79,37 @@ public class DetailActivity extends AppCompatActivity implements
             //trying to put in logic to only put labels in certain intervals
             @Override
             public String getFormattedValue(float value, AxisBase axis) {
-//                long date_num = (long) value;
-//                Date date = new Date(date_num);
-//                return date.toString();
-                return "1";
+                int date_num = (int) value;
+                Date date = labels.get(date_num);
+                return sdf.format(date);
             }
         };
         XAxis xaxis = finalchart.getXAxis();
         xaxis.setValueFormatter(axisValueFormatter);
+        TextView start = (TextView) findViewById(R.id.start_date);
+        TextView end = (TextView) findViewById(R.id.end_date);
+        TextView max = (TextView) findViewById(R.id.min_price);
+        TextView min = (TextView) findViewById(R.id. max_price);
+        int start_date = (int) chart_data.get(getString(R.string.start_date));
+        int end_date = (int) chart_data.get(getString(R.string.end_date));
+        int max_x_value = (int) chart_data.get(getString(R.string.max_date));
+        int min_x_value = (int) chart_data.get(getString(R.string.min_date));
+        float max_price = (float) chart_data.get(getString(R.string.max_price));
+        float min_price = (float) chart_data.get(getString(R.string.min_price));
+        start.setText(getString(R.string.start_detail) +" "+ sdf.format(labels.get(start_date)));
+        end.setText(getString(R.string.end_detail) + " " + sdf.format(labels.get(end_date)));
+        max.setText(getString(R.string.max_price)+ " $" + max_price + " " + "("
+                + sdf.format(labels.get(max_x_value)) +")");
+        min.setText(getString(R.string.min_price)+ " $"+ + min_price + " " + "("
+                + sdf.format(labels.get(min_x_value)) +")");
+
+        //get the legend associated with the chart object and then set the legend to false as no
+        //need to show it with only one line
+        finalchart.getLegend().setEnabled(false);
+        //Description object is part of the MPChartAndroid Library
+        Description chart_desc = new Description();
+        chart_desc.setText("");
+        finalchart.setDescription(chart_desc);
         finalchart.invalidate();
 
 

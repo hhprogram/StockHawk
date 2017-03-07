@@ -68,16 +68,24 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
 //    stock info (price) and the change in price depending on the shared preferences
     @Override
     public void onBindViewHolder(StockViewHolder holder, int position) {
+        String changeMode;
 
         cursor.moveToPosition(position);
 
 //        Timber.d("history for %s : %s", cursor.getString(Contract.Quote.POSITION_SYMBOL),
 //                cursor.getString(Contract.Quote.POSITION_HISTORY));
 
+        String stock_symbol = cursor.getString(Contract.Quote.POSITION_SYMBOL);
+        Float fmt = cursor.getFloat(Contract.Quote.POSITION_PRICE);
 
-        holder.symbol.setText(cursor.getString(Contract.Quote.POSITION_SYMBOL));
-        holder.price.setText(dollarFormat.format(cursor.getFloat(Contract.Quote.POSITION_PRICE)));
+        holder.symbol.setText(stock_symbol);
+        holder.price.setText(dollarFormat.format(fmt));
 
+        //set the content description to the textView represented by the SYMBOL attribute of the
+        //HOLDER (see below StockViewHolder class). This will assign each seperate view a
+        //specific content description that aligns with the specific ticker held in this HOLDER
+        holder.symbol.setContentDescription(stock_symbol);
+        holder.price.setContentDescription(dollarFormat.format(fmt));
 
         float rawAbsoluteChange = cursor.getFloat(Contract.Quote.POSITION_ABSOLUTE_CHANGE);
         float percentageChange = cursor.getFloat(Contract.Quote.POSITION_PERCENTAGE_CHANGE);
@@ -94,8 +102,10 @@ class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
         if (PrefUtils.getDisplayMode(context)
                 .equals(context.getString(R.string.pref_display_mode_absolute_key))) {
             holder.change.setText(change);
+            holder.change.setContentDescription(change);
         } else {
             holder.change.setText(percentage);
+            holder.change.setContentDescription(percentage);
         }
 
 

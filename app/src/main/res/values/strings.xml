@@ -19,12 +19,24 @@
 
 
     <string name="action_change_units">@string/pref_display_mode_key</string>
+    <string name="menu_title_dollar">Currently dollar display mode, click to switch to percent mode</string>
+    <string name="menu_title_percent">Currently percent display mode, click to switch to percent mode</string>
+    <string name="price_dates">Historical Dates</string>
+    <string name="start_date">Start Date</string>
+    <string name="end_date">End Date</string>
+    <string name="start_detail">Historical Data Begins:</string>
+    <string name="end_detail">Historical Data Ends:</string>
+    <string name="min_price">Min Price</string>
+    <string name="max_price">Max Price: </string>
+    <string name="max_date">Max Date: </string>
+    <string name="min_date">Min Date</string>
 
 
     <string name="dialog_title">Add Stock</string>
     <string name="dialog_hint">Symbol (e.g. GOOG)</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_add">Add</string>
+
 
     <string name="error_no_network">No network connectivity! Will load stock cursor when the network is available.</string>
     <string name="error_no_stocks">No stocks added! Hit the floating action button to add one.</string>

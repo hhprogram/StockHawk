@@ -8,6 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Handler;
+import android.os.Looper;
+import android.widget.Toast;
 
 import com.udacity.stockhawk.data.Contract;
 import com.udacity.stockhawk.data.PrefUtils;
@@ -40,7 +43,8 @@ public final class QuoteSyncJob {
     private QuoteSyncJob() {
     }
 
-    static void getQuotes(Context context) {
+    //called to actually get the stock info from the YahooFinance API
+    static void getQuotes(final Context context) {
 
         Timber.d("Running sync job");
 
@@ -49,7 +53,8 @@ public final class QuoteSyncJob {
         from.add(Calendar.YEAR, -YEARS_OF_HISTORY);
 
         try {
-
+            //gets the stock symbols that are in the sharedPreferences (ie the ones the use is
+            //interested in seeing
             Set<String> stockPref = PrefUtils.getStocks(context);
             Set<String> stockCopy = new HashSet<>();
             stockCopy.addAll(stockPref);
@@ -60,8 +65,11 @@ public final class QuoteSyncJob {
             if (stockArray.length == 0) {
                 return;
             }
-
+            //gets the info from YahooFinance API for all stocks in STOCKARRAY
             Map<String, Stock> quotes = YahooFinance.get(stockArray);
+            //makes an iterator through the HashSet of stock symbols in our sharedPref so we can
+            //loop through them once to insert the corresponding stock data for each symbol and
+            //put each one into a content values
             Iterator<String> iterator = stockCopy.iterator();
 
             Timber.d(quotes.toString());
@@ -73,8 +81,25 @@ public final class QuoteSyncJob {
 
 
                 Stock stock = quotes.get(symbol);
-                StockQuote quote = stock.getQuote();
+                Timber.d(stock.toString() + "stock info via Yahoo Finance API");
 
+                StockQuote quote = stock.getQuote();
+                //note: in order to show a Toast from a background service thread - need to use
+                //a handler:
+                //https://discussions.udacity.com/t/toast-from-a-service-from-background-thread/221010/2
+                if (quote.getAsk() == null) {
+                    //remove the invalid ticker from the sharedPref - or else everytime we refresh
+                    //the main page this will be activated because the invalid string is still in
+                    //the SharedPref
+                    PrefUtils.removeStock(context, quote.getSymbol());
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(context, "invalid ticker", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    continue;
+                }
                 float price = quote.getPrice().floatValue();
                 float change = quote.getChange().floatValue();
                 float percentChange = quote.getChangeInPercent().floatValue();
@@ -104,7 +129,8 @@ public final class QuoteSyncJob {
 
 
                 quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
-
+                //arrayList of content values that is later converted to an array for bulk insert
+                //into our DB
                 quoteCVs.add(quoteCV);
 
             }
@@ -147,16 +173,23 @@ public final class QuoteSyncJob {
 
     }
 
-    public static synchronized void syncImmediately(Context context) {
+    public static synchronized void syncImmediately(final Context context) {
 
         ConnectivityManager cm =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+        //checks if have network access they launches the QuoteIntent Service
         if (networkInfo != null && networkInfo.isConnectedOrConnecting()) {
             Intent nowIntent = new Intent(context, QuoteIntentService.class);
             context.startService(nowIntent);
         } else {
-
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(context, "No network connection - Stock info may be out of date"
+                            , Toast.LENGTH_SHORT).show();
+                }
+            });
             JobInfo.Builder builder = new JobInfo.Builder(ONE_OFF_ID, new ComponentName(context, QuoteJobService.class));
 
 
