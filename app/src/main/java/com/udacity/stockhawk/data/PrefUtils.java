@@ -204,6 +204,9 @@ public final class PrefUtils {
         Timber.d(entries.get(0).toString() + labels.get(2633));
         LineDataSet lineDataSet = new LineDataSet(entries, context.getString(R.string.hist_prices));
         lineDataSet.setColors(new int[] {R.color.colorPrimaryDark}, context);
+        //this method makes so each entry point doesn't have a circle on it in the graph (so graph
+        //is just a line. If TRUE then each actual entry data point will have a circle marker
+        lineDataSet.setDrawCircles(false);
         LineData lineData = new LineData(lineDataSet);
         chart_data.put(context.getString(R.string.line_data), lineData);
         chart_data.put(context.getString(R.string.hist_prices), entries);
