@@ -26,6 +26,28 @@
             android:parentActivityName=".ui.MainActivity">
         </activity>
 
+        <!--need to add the below code so android knows their is a widget with this app just
+        like we did for the content provider-->
+        <receiver android:name=".ui.WidgetProvider"
+            android:label="@string/widget_title">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/app_widget_provider_info" />
+        </receiver>
+
+        <!--note: IMPORTANT: there is a difference between BIND_REMOTEVIEW and BIND_REMOTEVIEWS
+        since my widget REMOTEVIEWS objects need permission to be BIND_REMOTEVIEWS or else will not
+        probably initate the widget service and thus will not actually call widgetDataProvider or
+        WidgetService. The widget will still appear in the widget list and the base layout
+        can still be correctly shown (ie WidgetProvider class will still be called and its
+        onUpdate() method willbe called but when trying to call WidgetService from WidgetProvider
+        it will break since it doesn't have permission for REMOTEVIEWS. Also this only realized
+        once I uninstalled and reinstalled with new manifest as the manifest doesn't update unless
+        you reinstall it on emulator / phone-->
+        <service android:name=".sync.WidgetService"
+                 android:permission="android.permission.BIND_REMOTEVIEWS"/>
 
         <service
             android:name=".sync.QuoteIntentService"
@@ -34,7 +56,7 @@
         <provider
             android:name=".data.StockProvider"
             android:authorities="com.udacity.stockhawk"
-            android:exported="false" />
+            android:exported="true" />
 
         <service
             android:name=".sync.QuoteJobService"

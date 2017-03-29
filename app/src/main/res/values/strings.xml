@@ -30,6 +30,7 @@
     <string name="max_price">Max Price: </string>
     <string name="max_date">Max Date: </string>
     <string name="min_date">Min Date</string>
+    <string name="to_homescreen">Back to home screen</string>
 
 
     <string name="dialog_title">Add Stock</string>
@@ -43,12 +44,13 @@
 
     <string name="toast_stock_added_no_connectivity">Symbol %s added. Will refresh when network available.</string>
     <string name="toast_no_connectivity">Will refresh when network available.</string>
-    <string name="date_format">yyyy-MM-dd</string>
-    <string name="comma">,</string>
-    <string name="new_line">\n</string>
+    <string name="date_format" translatable="false">yyyy-MM-dd</string>
+    <string name="comma" translatable="false">,</string>
+    <string name="new_line" translatable="false">\n</string>
     <string name="hist_prices">Historical Prices</string>
     <string name="line_data">Line Graph Data</string>
     <string name="line_labels">Line Graph Labels</string>
+    <string name="widget_title">Stocks</string>
 
 
 </resources>

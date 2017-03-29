@@ -9,7 +9,6 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.udacity.stockhawk.R;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -127,6 +126,7 @@ public final class PrefUtils {
     }
 
     /**
+     * HLI CODE
      * converts string to LINEDATA (object used in MPANDROIDCHART library - which is what we're
      * using to graph historical data
      * @param context - the CONTEXT that is calling this so we can use XML resources etc..
@@ -162,8 +162,7 @@ public final class PrefUtils {
         int max_time = 0;
         Long time;
         Date date;
-        String str_date, price_str;
-        SimpleDateFormat sdf = new SimpleDateFormat(context.getString(R.string.date_format));
+        String price_str;
         //loops through whole string (which holds historical data). Parses and gets the date and
         //corresponding price and makes entries and puts them into an ArrayList. Also, converts
         //the Long value (which is what the date is stored as) into its string representation and

@@ -46,6 +46,7 @@ public class DetailActivity extends AppCompatActivity implements
         detailBundle = intent.getExtras();
         stockSymbol = detailBundle.getString(Contract.Quote.COLUMN_SYMBOL);
         getSupportActionBar().setTitle(stockSymbol);
+        getSupportActionBar().setHomeActionContentDescription(R.string.to_homescreen);
 
         getSupportLoaderManager().initLoader(STOCK_LOADER, null, this);
     }
@@ -70,7 +71,7 @@ public class DetailActivity extends AppCompatActivity implements
         //instantiated
         final HashMap<Integer, Date> labels = (HashMap<Integer, Date>) chart_data
                 .get(getString(R.string.line_labels));
-        final SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/YY");
+        final SimpleDateFormat sdf = new SimpleDateFormat(getString(R.string.date_format));
         LineChart finalchart = (LineChart) findViewById(R.id.chart);
         finalchart.setData(lineData);
 

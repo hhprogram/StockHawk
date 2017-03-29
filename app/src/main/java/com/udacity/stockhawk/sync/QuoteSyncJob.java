@@ -87,10 +87,11 @@ public final class QuoteSyncJob {
                 //note: in order to show a Toast from a background service thread - need to use
                 //a handler:
                 //https://discussions.udacity.com/t/toast-from-a-service-from-background-thread/221010/2
-                if (quote.getAsk() == null) {
+                if (quote.getPreviousClose() == null) {
                     //remove the invalid ticker from the sharedPref - or else everytime we refresh
                     //the main page this will be activated because the invalid string is still in
                     //the SharedPref
+                    Timber.d(quote.getSymbol() + " says ask is null");
                     PrefUtils.removeStock(context, quote.getSymbol());
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
