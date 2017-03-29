@@ -92,15 +92,16 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     public RemoteViews getLoadingView() {
         return null;
     }
-
+//note when this just returns 0 then all i get is a 'loading..." in each view but when set to 1
+//    a proper view shows up
     @Override
     public int getViewTypeCount() {
-        return 0;
+        return 1;
     }
 
     @Override
     public long getItemId(int i) {
-        return i;
+        return 0;
     }
 
     @Override
