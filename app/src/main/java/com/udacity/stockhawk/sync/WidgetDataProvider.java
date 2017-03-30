@@ -73,11 +73,12 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
         if (mCursor.moveToPosition(i)) {
             Timber.d(mCursor.getString(Contract.Quote.POSITION_SYMBOL));
             view.setTextViewText(R.id.symbol, mCursor.getString(Contract.Quote.POSITION_SYMBOL));
-            view.setTextViewText(R.id.price, mCursor.getString(Contract.Quote.POSITION_SYMBOL));
+            view.setTextViewText(R.id.price, mCursor.getString(Contract.Quote.POSITION_PRICE));
             if (display_mode.equals(mContext.getString(R.string.pref_display_mode_absolute_key))) {
-                view.setTextViewText(R.id.change, mCursor.getString(Contract.Quote.POSITION_SYMBOL));
+                view.setTextViewText(R.id.change, "$" + mCursor
+                        .getString(Contract.Quote.POSITION_ABSOLUTE_CHANGE));
             } else if (display_mode.equals(mContext.getString(R.string.pref_display_mode_percentage_key))) {
-                view.setTextViewText(R.id.change, mCursor.getString(Contract
+                view.setTextViewText(R.id.change, "%"+mCursor.getString(Contract
                         .Quote.POSITION_PERCENTAGE_CHANGE));
             }
         }

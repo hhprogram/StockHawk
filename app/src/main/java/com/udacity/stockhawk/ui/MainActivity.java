@@ -1,5 +1,7 @@
 package com.udacity.stockhawk.ui;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -188,14 +190,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * @param item - the specific item in the Menu that we want to change the display mode of
      */
     private void setDisplayModeMenuItemIcon(MenuItem item) {
+        ComponentName name = new ComponentName(this, WidgetProvider.class);
+        int[] ids = AppWidgetManager.getInstance(this).getAppWidgetIds(name);
         if (PrefUtils.getDisplayMode(this)
                 .equals(getString(R.string.pref_display_mode_absolute_key))) {
             item.setIcon(R.drawable.ic_percentage);
 //            this should also set the content description
             item.setTitle(R.string.menu_title_dollar);
+            Intent intent = new Intent(this, WidgetProvider.class);
+            intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+            sendBroadcast(intent);
         } else {
             item.setIcon(R.drawable.ic_dollar);
             item.setTitle(R.string.menu_title_percent);
+            Intent intent = new Intent(this, WidgetProvider.class);
+            intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+            sendBroadcast(intent);
         }
 
     }
