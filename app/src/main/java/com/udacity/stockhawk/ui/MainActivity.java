@@ -187,9 +187,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      * shared preferences value obtained by the PrefUtils. getDisplayMode() method
      * Trying to dynamically set the title of the menu item (which also sets the contentDescription
      * to the title as well) depending on the current setting
+     *
+     * TODO: use the new intent filter created to send a broadcast to my WidgetProvider onReceive()
+     * method once i change the display mode instead of trying to call the system's onUpdate()
+     * method
      * @param item - the specific item in the Menu that we want to change the display mode of
      */
     private void setDisplayModeMenuItemIcon(MenuItem item) {
+//        componentname used to get a specific application component like a content provider or
+//        a broadcast receiver or service. App widget is a type of provider
         ComponentName name = new ComponentName(this, WidgetProvider.class);
         int[] ids = AppWidgetManager.getInstance(this).getAppWidgetIds(name);
         if (PrefUtils.getDisplayMode(this)
@@ -197,19 +203,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             item.setIcon(R.drawable.ic_percentage);
 //            this should also set the content description
             item.setTitle(R.string.menu_title_dollar);
-            Intent intent = new Intent(this, WidgetProvider.class);
-            intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-            sendBroadcast(intent);
+
         } else {
             item.setIcon(R.drawable.ic_dollar);
             item.setTitle(R.string.menu_title_percent);
-            Intent intent = new Intent(this, WidgetProvider.class);
-            intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
-            sendBroadcast(intent);
         }
-
+//        this creates an intent that will be carry info required when I send the broadcast out
+//        and it is received by the WidgetProvider class which is a Broadcast receiver (see the
+//        android manifest file where it is defined as such)
+        Intent intent = new Intent(this, WidgetProvider.class);
+        intent.setAction(getString(R.string.custom_action));
+        intent.putExtra(getString(R.string.widget_ids), ids);
+        sendBroadcast(intent);
     }
 
 //    create a options menu - where the item isn't a drop down of all possible options but is

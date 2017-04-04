@@ -51,6 +51,8 @@
     <string name="line_data">Line Graph Data</string>
     <string name="line_labels">Line Graph Labels</string>
     <string name="widget_title">Stocks</string>
+    <string name="custom_action" translatable="false">com.udacity.stockhawk.ui.UPDATE_DATA</string>
+    <string name="widget_ids" translatable="false">widget_ids</string>
 
 
 </resources>

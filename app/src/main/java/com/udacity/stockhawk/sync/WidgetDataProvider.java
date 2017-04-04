@@ -3,6 +3,7 @@ package com.udacity.stockhawk.sync;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 
@@ -74,12 +75,18 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
             Timber.d(mCursor.getString(Contract.Quote.POSITION_SYMBOL));
             view.setTextViewText(R.id.symbol, mCursor.getString(Contract.Quote.POSITION_SYMBOL));
             view.setTextViewText(R.id.price, mCursor.getString(Contract.Quote.POSITION_PRICE));
+            float change = Float.valueOf(mCursor.getString(Contract.Quote.POSITION_ABSOLUTE_CHANGE));
             if (display_mode.equals(mContext.getString(R.string.pref_display_mode_absolute_key))) {
                 view.setTextViewText(R.id.change, "$" + mCursor
                         .getString(Contract.Quote.POSITION_ABSOLUTE_CHANGE));
             } else if (display_mode.equals(mContext.getString(R.string.pref_display_mode_percentage_key))) {
                 view.setTextViewText(R.id.change, "%"+mCursor.getString(Contract
                         .Quote.POSITION_PERCENTAGE_CHANGE));
+            }
+//            this calls the method given by the 2nd argument (ie setBackgroundColor) on the view
+//            given by the first argument and sets it to the value in the 3rd argument
+            if (change < 0) {
+                view.setInt(R.id.change, "setBackgroundColor", Color.RED);
             }
         }
 //        do {
@@ -89,22 +96,28 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
         return view;
     }
 
+//    custom placeholder that shows a custom loading view in the interim when the actual view
+//    returned by getViewAt
     @Override
     public RemoteViews getLoadingView() {
         return null;
     }
+
 //note when this just returns 0 then all i get is a 'loading..." in each view but when set to 1
 //    a proper view shows up
     @Override
     public int getViewTypeCount() {
-        return 1;
+        return 1    ;
     }
 
+//    should return the unique ID of the row of the item at position i in my cursor
     @Override
     public long getItemId(int i) {
         return 0;
     }
 
+//  telling me if the IDs returned in getItemID are unique and no 2 IDs refer to same thing.
+//    ie changes to underlying data won't impact ID mapping
     @Override
     public boolean hasStableIds() {
         return false;

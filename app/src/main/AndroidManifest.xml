@@ -32,6 +32,12 @@
             android:label="@string/widget_title">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <!--add another intent filter, a custom one to be used when I want to handle
+                specific types of updates to the widgets like changes in Data in the DB or changes
+                in the shared preferences. Use this and then catch in the onReceive method
+                on my WidgetDataProvider-->
+                <!--com.udacity.stockhawk.ui.UPDATE_DATA -->
+                <action android:name="@string/custom_action"/>
             </intent-filter>
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/app_widget_provider_info" />

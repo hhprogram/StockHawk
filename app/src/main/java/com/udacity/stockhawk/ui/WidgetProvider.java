@@ -45,4 +45,29 @@ public class WidgetProvider extends AppWidgetProvider{
         }
 
     }
+
+    //    need to override the onReceive() method. It is called when an intent is sent (one of the
+//    intent filters listed on the WidgetProvider section of the Manifest) Then in this method
+//    we have logic to take certain actions depending what intent was received. Then have the
+//    appWidgetManager call the below given method and then this will make the widget that received
+//    this call its onDataSetChanged method and correctly update the widget
+//    appWidgetManager.notifyAppWidgetViewDataChanged. Calling this method then well call the
+//    WidgetDatProvider class' onDataSetChanged() method which in my case will update the whole
+//    widget list view for the latest in the shared preferences so any changes in the DB of tickers
+//    or whether display mode is % or $ will be updated once you view the widget again. Does the
+//    actual onDataSetChange() method call only once I exit the application and can see the widget in view
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        super.onReceive(context, intent);
+        Timber.d("Inside onReceive: " + intent.getAction());
+        if (intent.getAction().equals(context.getString(R.string.custom_action))) {
+            Timber.d("inside more");
+            int[] ids = intent.getIntArrayExtra(context.getString(R.string.widget_ids));
+            Timber.d(ids.toString());
+            AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(ids
+                    , R.id.widget_list);
+        }
+    }
+
+
 }
