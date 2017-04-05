@@ -32,7 +32,6 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     public void onCreate() {
 //        get a cursor for all quotes in the DB currently - not sure if this is best way but using
 //        this cursor to update the widget (can I leverage the adapter somehow?
-//        mCursor = mContext.getContentResolver().query(Contract.Quote.URI, null, null, null, null);
         Timber.d("Widget dataprovider in widget provider");
     }
 
@@ -74,7 +73,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
         if (mCursor.moveToPosition(i)) {
             Timber.d(mCursor.getString(Contract.Quote.POSITION_SYMBOL));
             view.setTextViewText(R.id.symbol, mCursor.getString(Contract.Quote.POSITION_SYMBOL));
-            view.setTextViewText(R.id.price, mCursor.getString(Contract.Quote.POSITION_PRICE));
+            view.setTextViewText(R.id.price, "$"+mCursor.getString(Contract.Quote.POSITION_PRICE));
             float change = Float.valueOf(mCursor.getString(Contract.Quote.POSITION_ABSOLUTE_CHANGE));
             if (display_mode.equals(mContext.getString(R.string.pref_display_mode_absolute_key))) {
                 view.setTextViewText(R.id.change, "$" + mCursor
@@ -89,10 +88,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
                 view.setInt(R.id.change, "setBackgroundColor", Color.RED);
             }
         }
-//        do {
-//            view.setTextViewText(symbol, mCursor.getString(Contract.Quote.POSITION_SYMBOL));
-//
-//        } while (mCursor.moveToNext())
+
         return view;
     }
 

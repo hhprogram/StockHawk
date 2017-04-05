@@ -13,6 +13,7 @@ import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.udacity.stockhawk.R;
@@ -87,6 +88,9 @@ public class DetailActivity extends AppCompatActivity implements
         };
         XAxis xaxis = finalchart.getXAxis();
         xaxis.setValueFormatter(axisValueFormatter);
+//        gets the yaxis object (the left yaxis)
+        YAxis yaxis = finalchart.getAxisLeft();
+        yaxis.setDrawLabels(true);
         TextView start = (TextView) findViewById(R.id.start_date);
         TextView end = (TextView) findViewById(R.id.end_date);
         TextView max = (TextView) findViewById(R.id.min_price);
@@ -109,7 +113,7 @@ public class DetailActivity extends AppCompatActivity implements
         finalchart.getLegend().setEnabled(false);
         //Description object is part of the MPChartAndroid Library
         Description chart_desc = new Description();
-        chart_desc.setText("");
+        chart_desc.setText("Stock Price in USD");
         finalchart.setDescription(chart_desc);
         finalchart.invalidate();
 

@@ -77,62 +77,72 @@ public final class QuoteSyncJob {
             ArrayList<ContentValues> quoteCVs = new ArrayList<>();
 
             while (iterator.hasNext()) {
-                String symbol = iterator.next();
-
-
+                final String symbol = iterator.next();
+//                boolean variable used to determine if the ticker symbol entered is a valid one
+                Boolean valid = true;
                 Stock stock = quotes.get(symbol);
-                Timber.d(stock.toString() + "stock info via Yahoo Finance API");
+                if (stock == null) {
+                    Timber.d(symbol + " not valid");
+                    valid = false;
+                } else {
+                    Timber.d(stock.toString() + "stock info via Yahoo Finance API");
+                    final StockQuote quote = stock.getQuote();
+                    //note: in order to show a Toast from a background service thread - need to use
+                    //a handler:
+                    //https://discussions.udacity.com/t/toast-from-a-service-from-background-thread/221010/2
+                    if (quote.getPreviousClose() == null) {
+                        //remove the invalid ticker from the sharedPref - or else everytime we refresh
+                        //the main page this will be activated because the invalid string is still in
+                        //the SharedPref
+                        Timber.d(quote.getSymbol() + " says ask is null");
+                        valid = false;
+                    } else {
+                        float price = quote.getPrice().floatValue();
+                        float change = quote.getChange().floatValue();
+                        float percentChange = quote.getChangeInPercent().floatValue();
 
-                StockQuote quote = stock.getQuote();
-                //note: in order to show a Toast from a background service thread - need to use
-                //a handler:
-                //https://discussions.udacity.com/t/toast-from-a-service-from-background-thread/221010/2
-                if (quote.getPreviousClose() == null) {
-                    //remove the invalid ticker from the sharedPref - or else everytime we refresh
-                    //the main page this will be activated because the invalid string is still in
-                    //the SharedPref
-                    Timber.d(quote.getSymbol() + " says ask is null");
-                    PrefUtils.removeStock(context, quote.getSymbol());
+
+                        // WARNING! Don't request historical data for a stock that doesn't exist!
+                        // The request will hang forever X_x
+                        //each element in this list is a HISTORICAL QUOTE object which has an attribute
+                        //called DATE (which is retrieved below by GETDATE(), and a close price attribute
+                        //which is retrieved via getClose() method
+                        // see the commented out Timber code in the StockAdapter's onBindViewHolder method
+                        List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
+
+                        StringBuilder historyBuilder = new StringBuilder();
+
+                        for (HistoricalQuote it : history) {
+                            historyBuilder.append(it.getDate().getTimeInMillis());
+                            historyBuilder.append(", ");
+                            historyBuilder.append(it.getClose());
+                            historyBuilder.append("\n");
+                        }
+
+                        ContentValues quoteCV = new ContentValues();
+                        quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
+                        quoteCV.put(Contract.Quote.COLUMN_PRICE, price);
+                        quoteCV.put(Contract.Quote.COLUMN_PERCENTAGE_CHANGE, percentChange);
+                        quoteCV.put(Contract.Quote.COLUMN_ABSOLUTE_CHANGE, change);
+
+
+                        quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
+                        //arrayList of content values that is later converted to an array for bulk insert
+                        //into our DB
+                        quoteCVs.add(quoteCV);
+                    }
+                }
+                if (!valid) {
+                    PrefUtils.removeStock(context, symbol);
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(context, "invalid ticker", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(context, symbol +" invalid ticker"
+                                    , Toast.LENGTH_SHORT).show();
                         }
                     });
                     continue;
                 }
-                float price = quote.getPrice().floatValue();
-                float change = quote.getChange().floatValue();
-                float percentChange = quote.getChangeInPercent().floatValue();
-
-                // WARNING! Don't request historical data for a stock that doesn't exist!
-                // The request will hang forever X_x
-                //each element in this list is a HISTORICAL QUOTE object which has an attribute
-                //called DATE (which is retrieved below by GETDATE(), and a close price attribute
-                //which is retrieved via getClose() method
-                // see the commented out Timber code in the StockAdapter's onBindViewHolder method
-                List<HistoricalQuote> history = stock.getHistory(from, to, Interval.WEEKLY);
-
-                StringBuilder historyBuilder = new StringBuilder();
-
-                for (HistoricalQuote it : history) {
-                    historyBuilder.append(it.getDate().getTimeInMillis());
-                    historyBuilder.append(", ");
-                    historyBuilder.append(it.getClose());
-                    historyBuilder.append("\n");
-                }
-
-                ContentValues quoteCV = new ContentValues();
-                quoteCV.put(Contract.Quote.COLUMN_SYMBOL, symbol);
-                quoteCV.put(Contract.Quote.COLUMN_PRICE, price);
-                quoteCV.put(Contract.Quote.COLUMN_PERCENTAGE_CHANGE, percentChange);
-                quoteCV.put(Contract.Quote.COLUMN_ABSOLUTE_CHANGE, change);
-
-
-                quoteCV.put(Contract.Quote.COLUMN_HISTORY, historyBuilder.toString());
-                //arrayList of content values that is later converted to an array for bulk insert
-                //into our DB
-                quoteCVs.add(quoteCV);
 
             }
 
